@@ -1,5 +1,12 @@
+from django.shortcuts import render
 from django.http import JsonResponse
 from .services import run_b2b_scraper
+
+def dashboard_view(request):
+    """
+    接收用户的网页请求，返回一个 HTML 页面。
+    """
+    return render(request, 'scraper_app/dashboard.html')
 
 def trigger_scraper(request):
     """

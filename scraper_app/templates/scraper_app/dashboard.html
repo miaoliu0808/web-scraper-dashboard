@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraper Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 50px; text-align: center; }
+        .container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        h1 { color: #333; }
+        button { background-color: #4CAF50; color: white; padding: 15px 32px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #45a049; }
+        #status { margin-top: 20px; font-weight: bold; color: #555; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚀 B2B 数据抓取控制台</h1>
+    <p>点击下方按钮，系统将自动在云端执行爬虫任务并生成数据报表。</p>
+    
+    <button id="scrapeBtn" onclick="startScraping()">开始执行抓取任务</button>
+    
+    <div id="status"></div>
+</div>
+
+<script>
+    // 这段 JS 的作用是代替你手动在浏览器输入网址，让按钮去“敲打”你的 API
+    function startScraping() {
+        const btn = document.getElementById('scrapeBtn');
+        const statusDiv = document.getElementById('status');
+        
+        // 1. 改变按钮状态，给用户“正在加载”的反馈
+        btn.disabled = true;
+        btn.innerText = "数据抓取中，请稍候...";
+        statusDiv.innerText = "正在连接后厨服务...";
+        statusDiv.style.color = "blue";
+
+        // 2. 向你的 Django API 发起请求
+        fetch('/api/scrape/')
+            .then(response => response.json())
+            .then(data => {
+                // 3. 拿到结果后，更新页面显示
+                if(data.status === 'success') {
+                    statusDiv.innerText = "✅ 成功！生成文件：" + data.file_generated;
+                    statusDiv.style.color = "green";
+                } else {
+                    statusDiv.innerText = "❌ 发生错误：" + data.message;
+                    statusDiv.style.color = "red";
+                }
+            })
+            .catch(error => {
+                statusDiv.innerText = "❌ 网络请求失败！";
+                statusDiv.style.color = "red";
+            })
+            .finally(() => {
+                // 4. 任务结束，恢复按钮状态
+                btn.disabled = false;
+                btn.innerText = "开始执行抓取任务";
+            });
+    }
+</script>
+
+</body>
+</html>
